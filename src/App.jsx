@@ -10,18 +10,19 @@ import { BsFillLightningFill } from "react-icons/bs";
 import { IoMdPower } from "react-icons/io";
 
 function App() {
-  const CardToolsMain = ({ icons, text, link }) => {
-    return (
-      <div className="w-[43%] h-[130px] border-2 border-violet-400 rounded-xl shadow-lg bg-zinc-100 flex flex-col justify-center items-center gap-3 hover:cursor-pointer hover:border-pink-500">
-        <Link to={link}>
-          {icons}
-          <p className="text-[.9rem] font-bold uppercase text-gray-500">
-            {text}
-          </p>
-        </Link>
-      </div>
-    );
-  };
+  const ipAddress = import.meta.env.VITE_IP_ADDRESS;
+  // const CardToolsMain = ({ icons, text, link }) => {
+  //   return (
+  //     <div className="w-[43%] h-[130px] border-2 border-violet-400 rounded-xl shadow-lg bg-zinc-100 flex flex-col justify-center items-center gap-3 hover:cursor-pointer hover:border-pink-500">
+  //       <Link to={link}>
+  //         {icons}
+  //         <p className="text-[.9rem] font-bold uppercase text-gray-500">
+  //           {text}
+  //         </p>
+  //       </Link>
+  //     </div>
+  //   );
+  // };
 
   const CardTools = ({ icons, text, link }) => {
     return (
@@ -36,22 +37,28 @@ function App() {
     );
   };
 
-  const handleAllControls = (status) => {
+  const handleAllControls = async (status) => {
     console.log("All controls", status);
 
-    localStorage.setItem(
-      "isDoor",
-      JSON.stringify(status === "on" ? true : false)
-    );
-    localStorage.setItem(
-      "isLamp",
-      JSON.stringify({
-        lr1: status === "on" ? true : false,
-        lr2: status === "on" ? true : false,
-        lr3: status === "on" ? true : false,
-        lr4: status === "on" ? true : false,
-      })
-    );
+    try {
+      const res = await fetch(`${ipAddress}/${status}`);
+      const text = await res.text();
+      console.log(text);
+
+      localStorage.setItem(
+        "isDoor",
+        JSON.stringify(status === "on" ? true : false)
+      );
+      localStorage.setItem(
+        "isLamp",
+        JSON.stringify({
+          lr1: status === "on" ? true : false,
+          lr2: status === "on" ? true : false,
+        })
+      );
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -66,7 +73,7 @@ function App() {
         </p>
       </div>
       <div className="w-full h-max  mt-12">
-        <div className="w-full flex justify-between items-center ">
+        {/* <div className="w-full flex justify-between items-center ">
           <CardToolsMain
             icons={<GiGate className="text-[4rem] text-violet-500" />}
             text={"Gerbang"}
@@ -76,13 +83,8 @@ function App() {
             icons={<PiGarage className="text-[4rem] text-violet-500" />}
             text={"Garasi"}
           />
-        </div>
+        </div> */}
         <div className="w-full mt-10 h-max flex justify-between items-center flex-wrap gap-3">
-          {/* <CardTools
-            icons={<PiFanFill className="text-[2.5rem] text-teal-500" />}
-            text={"Kipas"}
-            link={"/kipas"}
-          /> */}
           <CardTools
             icons={<FaLightbulb className="text-[2.5rem] text-teal-500" />}
             text={"Lampu"}

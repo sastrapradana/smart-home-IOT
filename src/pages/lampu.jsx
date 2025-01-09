@@ -7,13 +7,6 @@ import { useEffect, useState } from "react";
 import AppShel from "../component/app-shell";
 
 export default function Lampu() {
-  // const [isLamp, setIsLamp] = useState({
-  //   lr1: false,
-  //   lr2: true,
-  //   lr3: true,
-  //   lr4: true,
-  // });
-
   const [isLamp, setIsLamp] = useState(() => {
     const storedLamp = localStorage.getItem("isLamp");
     return storedLamp !== null
@@ -21,29 +14,48 @@ export default function Lampu() {
       : {
           lr1: false,
           lr2: true,
-          lr3: true,
-          lr4: true,
         };
   });
+
+  const ipAddress = import.meta.env.VITE_IP_ADDRESS;
 
   const areAllLampsOn = () => {
     return Object.values(isLamp).every((status) => status === true);
   };
 
-  const toggleLampLr = (lr) => {
-    setIsLamp((prevLamp) => ({
-      ...prevLamp,
-      [lr]: !prevLamp[lr],
-    }));
+  const toggleLampLr = async (lr) => {
+    console.log(lr);
+    try {
+      const res = await fetch(
+        `${ipAddress}/${lr == "lr1" ? "lampu/1" : "lampu/2"}`
+      );
+      const text = await res.text();
+      console.log(text);
+
+      setIsLamp((prevLamp) => ({
+        ...prevLamp,
+        [lr]: !prevLamp[lr],
+      }));
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const toggleLamp = (status) => {
-    setIsLamp({
-      lr1: status,
-      lr2: status,
-      lr3: status,
-      lr4: status,
-    });
+  const toggleLamp = async (status) => {
+    try {
+      const res = await fetch(
+        `${ipAddress}/${status ? "lampu" : "lampu-mati"}`
+      );
+      const text = await res.text();
+      console.log(text);
+
+      setIsLamp({
+        lr1: status,
+        lr2: status,
+      });
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
@@ -99,11 +111,9 @@ export default function Lampu() {
             />
           </div>
         </div>
-        <div className="w-full mt-7 flex justify-between items-center">
+        <div className="w-full mt-7 flex justify-center gap-6 items-center">
           <Lamp ruang="1" status={isLamp.lr1} />
           <Lamp ruang="2" status={isLamp.lr2} />
-          <Lamp ruang="3" status={isLamp.lr3} />
-          <Lamp ruang="4" status={isLamp.lr4} />
         </div>
       </section>
     </AppShel>
